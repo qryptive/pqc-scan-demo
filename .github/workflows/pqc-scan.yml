@@ -1,0 +1,49 @@
+name: PQC Demo Scan
+# Qryptive PQC scan: finds quantum-vulnerable cryptography. The scan runs in this runner.
+# This workflow sets no Qryptive key, so nothing is sent to Qryptive.
+# The scan still uses GitHub: checking out code, pulling the scanner image from ghcr.io,
+# fetching the pull request base, and writing annotations and the job summary.
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  schedule:
+    - cron: '17 6 * * 1'   # weekly whole-repo scan, Mondays 06:17 UTC
+  workflow_dispatch:
+
+# One scan per branch at a time: a newer run on the same branch (a push, the weekly or a
+# manual run) cancels the one still in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pqc-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PQC Vulnerability Scanner
+        uses: qryptive/pqc-scanner-action@v1
+        with:
+          fail_on_vulnerable: "false"   # set to "true" to fail the build on findings
+          severity_threshold: medium
+          scan_scope: auto              # changed files on pull requests, the whole repo otherwise
+          auto_fix: "false"
+          report_format: json           # also writes qryptive-scan-report.json
+
+      - name: Keep the JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qryptive-scan-report
+          path: qryptive-scan-report.json
+          if-no-files-found: warn
