@@ -3,14 +3,17 @@
 
 Usage: python3 compare_report.py EXPECTED.json ACTUAL.json
 
-Two reports match when they have the same outcome and the same SET of
-(repo-relative path, line, algorithm, severity). Timestamps, scanner build ids, summary counts
+Two reports match when they have the same outcome and the same MULTISET of
+(repo-relative path, line, algorithm, severity), so a repeated entry counts each time. Timestamps, scanner build ids, summary counts
 and absolute path prefixes are ignored. Exit 0 on a match, 1 on a mismatch (the difference is
 printed), 2 when a file cannot be read as a v1 report.
 """
 import json
 import sys
+from collections import Counter
 
+OUTCOMES = ("COMPLETE", "PARTIAL", "FAILED", "UNVERIFIED", "NO_FILES_MATCHED_PATTERNS",
+            "NO_SUPPORTED_FILES_IN_REPO", "NO_CHANGED_SUPPORTED_FILES")
 PREFIXES = ("/github/workspace/", "/workspace/", "./")
 
 
@@ -30,9 +33,11 @@ def load(path):
     findings = d.get("findings")
     if not isinstance(findings, list):
         raise ValueError("no findings list: %s" % path)
-    keys = set()
+    if d.get("outcome") not in OUTCOMES:
+        raise ValueError("unknown outcome %r: %s" % (d.get("outcome"), path))
+    keys = Counter()
     for f in findings:
-        keys.add((norm_path(f["path"]), f.get("line"), f.get("algorithm"), f.get("severity")))
+        keys[(norm_path(f["path"]), f.get("line"), f.get("algorithm"), f.get("severity"))] += 1
     return d.get("outcome"), keys
 
 
@@ -41,9 +46,9 @@ def compare(expected, actual):
     out = []
     if expected[0] != actual[0]:
         out.append("outcome: expected %s, got %s" % (expected[0], actual[0]))
-    for k in sorted(expected[1] - actual[1], key=str):
+    for k in sorted((expected[1] - actual[1]).elements(), key=str):
         out.append("missing: %s:%s %s %s" % k)
-    for k in sorted(actual[1] - expected[1], key=str):
+    for k in sorted((actual[1] - expected[1]).elements(), key=str):
         out.append("extra:   %s:%s %s %s" % k)
     return out
 

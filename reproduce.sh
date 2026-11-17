@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reproduces the recorded demo scan exactly, offline from GitHub: same source commit, same scanner
+# Reproduces the recorded demo scan exactly, from a fresh clone: same source commit, same scanner
 # image (by digest), same settings. Generated from github-action/action.yml by gen_reproduce.py.
 #
 #   source commit  : cb1ccbb4037401edac6f8176e0d9ff11e5c7a09e
