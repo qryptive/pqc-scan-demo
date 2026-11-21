@@ -21,4 +21,4 @@ key. What is sent, and when:
 
 Add the same scan to your own repository: [qryptive.ai/scanner/install](https://qryptive.ai/scanner/install).
 
-Scanner image used for the recorded run: `ghcr.io/qryptive/pqc-scanner@sha256:3f78060af516743bdb36bbc0f78a7900bf9aa5a8e6956847894e2e1cbd440f89`
+Scanner image used for the recorded run: `ghcr.io/qryptive/pqc-scanner@sha256:f3dd8cdb4fa6393ecbbf1b2ff10f500be8eb9072a8538ea38009ffd1feedf760`
