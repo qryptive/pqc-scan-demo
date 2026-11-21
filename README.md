@@ -4,9 +4,10 @@ The code in `src/` uses weak and quantum-vulnerable cryptography on purpose (MD5
 RSA, ECDSA, weak TLS and KMS settings in Python, Java, Go and Terraform). None of it does
 anything real. It exists so you can see what the [Qryptive scanner](https://github.com/qryptive/pqc-scanner-action) reports.
 
-**See a result:** open the latest run in the [Actions tab](../../actions), then its job summary.
-The run also keeps the full report as the artifact `qryptive-scan-report`. The last recorded run
-found 26 entries: 3 critical, 20 high and 3 informational.
+**See a result:** read the [recorded result](expected/RESULT.md). No GitHub sign-in needed. The
+last recorded run found 26 entries: 3 critical, 20 high and 3 informational. If you are signed in
+to GitHub, you can also open the latest run in the [Actions tab](../../actions) for its job summary
+and the full report artifact `qryptive-scan-report`. GitHub hides both from signed-out visitors.
 
 **Run it yourself:** fork this repository and run the "PQC Demo Scan" workflow. That uses the
 current scanner, so counts can change between releases.
